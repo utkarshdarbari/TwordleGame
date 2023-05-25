@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<!-- Jinja template -->
+<!-- please remember the value is valid inside of a scope -->
+<!-- some tricky statement is used to share outside of a scope -->
+<html>
+    <head>
+        <meta charset="UTF-8"></meta> 
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></meta><!-- traditional way -->
+        <meta name="viewport" content="width=device-width, initial-scale=1"></meta><!-- applicable for mobiles -->
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='mystyle.css') }}">
+        <title>Wordle Game</title>
+    </head>
+    <body onload="document.location='#next'; document.getElementById('word').focus();">
+        <header>
+            <div class="header-bar">
+                <h2 class="score">Score Streak : {{ score }}</h2>
+                <h2 class="score">Highest Score : {{ highscore }}</h2>
+                <a href="/reset-highscore" class="score">Reset High Score</a>
+            </div>
+        </header>
+        <div class="infobox">
+            <h1 class="info">Welcome to Twordle game!! This word has {{ lenWord }} letters.</h1>
+            <h2 class="info">If your guess word longer than {{lenWord}} letters, your word will be cut off. If shorter, your word will not be counted.</h2>
+            <h2 class="info">Twordle doesnt allow you to guess words that have repetative letters in them. So get your word dictionary out.</h2>
+            <h3 class="info">Example len=5: class--> not counted! clamp--> valid</h3>
+            <h2 id="warn" class="info">{{ warn }}</h2>
+            <br>
+            <h2 id="left" class="info">guess word left : {{ wordleft }}</h2>
+        </div>
+        <!-- <div>
+
+        <!- {{ word }}<br/> -->
+
+        <!-- {{ history }}<br/> -->
+        <!-- {{ message }}<br/> -->
+        <!-- {{ current }} -->
+        <!-- <div>{{ word }}</div> -->
+        <div class="container center">
+        <div>
+        {% set correct_flag = [False] %}
+        {% for hist in history %}
+            <div class="margin">
+            {% for letter in hist %}
+                {% if letter == word[loop.index0] %}
+                    <span class="green padding">{{ letter }}</span>
+                {% elif word.find(letter) == -1 %}
+                    <span class="gray padding">{{ letter }}</span>
+                {% elif word.find(letter) == -1 %}
+                    <span class="gray padding">{{ letter }}</span>
+                {% else %}
+                    <span class="yellow padding">{{ letter }}</span>
+                {% endif %}
+            {% endfor %}
+            </div>
+            <br/>
+            {% if hist == word %}
+            {%   set _ = correct_flag.pop() %}
+            {%   set _ = correct_flag.append(True) %}
+            {% endif %}
+        {% endfor %}
+        </div>
+        {% if reset==1 %}
+        <script>
+            document.addEventListener("keydown", function(event) {
+                if (event.code === "Enter") {
+                    window.location.href = "/resetscore";
+                }
+            });
+            </script>
+        <div>
+        <form method="GET" action="/resetscore">
+            <input type="submit" value="Play Again!" class="smallbutton"></input>
+        </form>
+        {% elif correct_flag == [False] %}
+        <script>
+            document.addEventListener("keydown", function(event) {
+                if (event.code === "Enter") {
+                    window.location.href = "/";
+                }
+            });
+            </script>
+        <a name="next"> </a>
+        <form method="POST" action="/">
+            <input id="word" type="text" name="query" class="answerbox" maxlength="5"></input>
+            <input type="submit" value="Wordle?" class="smallbutton"></input>
+        </form>
+        <form method="GET" action="/resetscore">
+            <input type="submit" value="Give up, Reset score streak!" class="largebutton"></input>
+        </form>
+       
+        {% else %}
+        <script>
+            document.addEventListener("keydown", function(event) {
+                if (event.code === "Enter") {
+                    window.location.href = "/logout";
+                }
+              });
+        </script>
+        <form method="GET" action="/logout">
+            <input type="submit" value="Next word" class="smallbutton"></input>
+        </form>
+        {% endif %}
+    </div>
+    </body>
+</html>
